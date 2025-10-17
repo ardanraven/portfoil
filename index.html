@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leonardo Machado - Triplice Studios | Forjando Experiências Digitais</title>
+    <!-- Favicon (ícone da aba do navegador) -->
+    <link rel="icon" type="image/png" href="https://i.imgur.com/rE7tV7a.png">
+
+    <!-- Google Fonts: Syne para o corpo, Cinzel para títulos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet">
+
+    <!-- jQuery para a Animação de Prazos -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <style>
+        :root {
+            --dark-grey: #303030;
+            --text-color: #F0F0F0;
+            --accent-yellow: #E3FD22;
+            --black-hand-panel: #1A1A1A;
+            --section-bg: #222222;
+            --deadline-red: #BE002A;
+        }
+
+        /* Reset Básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background-color: var(--dark-grey);
+            color: var(--text-color);
+            font-family: 'Syne', sans-serif;
+            overflow-x: hidden; /* Permite scroll vertical, previne horizontal */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+        
+        /* Cursor Customizado */
+        .custom-cursor {
+            position: fixed;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+            z-index: 10001; /* Acima do modal */
+            transform: translate(-50%, -50%);
+        }
+        #cursor-ring {
+            width: 25px;
+            height: 25px;
+            border: 1px solid var(--text-color);
+            border-radius: 50%;
+            transition: transform 0.2s ease-out, border-color 0.2s ease-out;
+            opacity: 0.8;
+        }
+        .custom-cursor.hover-effect #cursor-ring {
+            transform: scale(1.5);
+            border-color: var(--accent-yellow);
+        }
+
+        /* Hero Container - Layout Principal */
+        .hero-container {
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 35% 1fr 35%;
+            grid-template-rows: 1fr auto 1fr;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Painéis Laterais com as Mãos */
+        .hand-panel {
+            grid-row: 1 / -1;
+            background-color: var(--black-hand-panel);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            opacity: 0.9;
+            z-index: 1;
+            position: relative;
+        }
+        #left-hand-panel {
+            grid-column: 1;
+            background-image: url('https://i.imgur.com/KdSyRBA.png');
+            background-position: center right -20%;
+        }
+        #right-hand-panel {
+            grid-column: 3;
+            background-image: url('https://i.imgur.com/vjRNKDz.png');
+            background-position: center left -20%;
+        }
+
+        /* Detalhe do canto superior esquerdo (amarelo) */
+        .corner-detail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            background-color: var(--accent-yellow);
+            filter: blur(5px);
+            border-bottom-right-radius: 50%;
+            z-index: 2;
+            opacity: 0;
+            animation: fadeIn 1.2s ease-out 2s forwards;
+        }
+
+        /* Conteúdo Central do Hero */
+        .main-content {
+            grid-column: 2;
+            grid-row: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 2;
+            padding: 2rem;
+        }
+        #name-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            font-size: clamp(3.5rem, 10vw, 9rem);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            color: var(--text-color);
+            opacity: 0;
+            animation: slideInUp 1s cubic-bezier(0.23, 1, 0.32, 1) forwards 0.5s;
+        }
+        .digital-highlight-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        .digital-text {
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            font-size: clamp(3.5rem, 10vw, 9rem);
+            line-height: 1;
+            text-transform: uppercase;
+            color: var(--text-color);
+            opacity: 0;
+            animation: slideInUp 1s cubic-bezier(0.23, 1, 0.32, 1) forwards 0.7s;
+            position: relative;
+            z-index: 3;
+        }
+        .yellow-bar {
+            position: absolute;
+            bottom: 0%;
+            left: -5%;
+            width: 110%;
+            height: 70%;
+            background-color: var(--accent-yellow);
+            z-index: 2;
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: revealBar 0.8s cubic-bezier(0.77, 0, 0.175, 1) 1.2s forwards;
+            filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.4));
+        }
+        #triplice-studio-text {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: clamp(0.7rem, 1.5vw, 1rem);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-top: 1.5rem;
+            color: var(--text-color);
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 1.8s;
+        }
+        #impact-phrase {
+            font-size: clamp(0.85rem, 1.8vw, 1.2rem);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            margin-top: 3rem;
+            max-width: 650px;
+            line-height: 1.6;
+            color: var(--text-color);
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 2s;
+        }
+        #impact-phrase span {
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        /* Navegação do Hero */
+        .bottom-right-nav {
+            grid-column: 3;
+            grid-row: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            padding: 2rem;
+            z-index: 3;
+            gap: 1.5rem;
+        }
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            background-color: var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            animation: fadeInScale 0.8s ease-out forwards;
+        }
+        .nav-item:nth-child(1) { animation-delay: 2.2s; }
+        .nav-item:nth-child(2) { animation-delay: 2.4s; }
+        .nav-item:hover {
+            background-color: var(--accent-yellow);
+            transform: scale(1.1);
+        }
+        .nav-item a {
+            color: var(--dark-grey);
+            font-size: 1.5rem;
+            text-decoration: none;
+            display: block;
+            line-height: 1;
+        }
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--dark-grey);
+            transition: fill 0.3s ease;
+        }
+
+        .bottom-left-explore {
+            grid-column: 1;
+            grid-row: 3;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            padding: 2rem;
+            z-index: 3;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 2.5s;
+        }
+        .explore-link {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-color);
+            text-decoration: none;
+            position: relative;
+            padding-bottom: 5px;
+        }
+        .explore-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--text-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease-out;
+        }
+        .explore-link:hover::after {
+            transform: scaleX(1);
+            background-color: var(--accent-yellow);
+        }
+        .explore-link:hover {
+            color: var(--accent-yellow);
+        }
+
+        /* Estilos Gerais das Seções */
+        .content-section {
+            padding: 120px 5%;
+            background-color: var(--section-bg);
+            border-top: 1px solid #444;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            position: relative;
+        }
+        .content-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .section-subtitle {
+            text-align: center;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            max-width: 700px;
+            margin: 0 auto 80px;
+            line-height: 1.7;
+            color: #a0a0a0;
+        }
+        .section-title span {
+            color: var(--accent-yellow);
+        }
+
+        /* Seção Portfólio */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        .portfolio-item {
+            background-color: var(--dark-grey);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+            position: relative;
+        }
+        .portfolio-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .portfolio-image-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+        .portfolio-image-wrapper::after {
+            content: 'Ver Detalhes ✧';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .portfolio-item:hover .portfolio-image-wrapper::after {
+            opacity: 1;
+        }
+        .portfolio-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .portfolio-item:hover .portfolio-image {
+            transform: scale(1.05);
+        }
+        .portfolio-content {
+            padding: 25px;
+        }
+        .portfolio-content h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .portfolio-content p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        /* Modal do Portfólio */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--dark-grey);
+            padding: 40px;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2.5rem;
+            color: var(--text-color);
+            line-height: 1;
+        }
+        .close-modal:hover {
+            color: var(--accent-yellow);
+        }
+        #modal-img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        #modal-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        #modal-desc {
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #ccc;
+        }
+        #modal-links {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        /* Seção Processo */
+        #process {
+             background-color: var(--dark-grey);
+        }
+        .process-steps {
+            display: flex;
+            justify-content: space-around;
+            gap: 40px;
+            text-align: center;
+            flex-wrap: wrap;
+        }
+        .process-step {
+            max-width: 300px;
+        }
+        .process-step .icon {
+            font-size: 3rem;
+            color: var(--accent-yellow);
+            margin-bottom: 20px;
+        }
+         .process-step h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        .process-step p {
+            color: #ccc;
+            line-height: 1.6;
+        }
+        
+        /* Seção de Planos */
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            align-items: start;
+        }
+        .plan-item {
+            background-color: var(--dark-grey);
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .plan-item:hover {
+            transform: translateY(-10px);
+        }
+        .plan-item.recommended {
+            border-color: var(--accent-yellow);
+            transform: scale(1.05);
+            position: relative;
+        }
+        .plan-item.recommended::before {
+            content: 'Mais Escolhido';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-yellow);
+            color: var(--dark-grey);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .plan-item h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .plan-item ul {
+            list-style: none;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .plan-item ul li {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .plan-item ul li::before {
+            content: '✧';
+            margin-right: 10px;
+            color: var(--accent-yellow);
+        }
+        
+        /* Seção Prazos (Deadline) */
+        #deadlines {
+            background: #000;
+            padding-top: 200px; /* Espaço para a animação */
+            padding-bottom: 120px;
+            min-height: 500px;
+        }
+        #deadline-container {
+            width:581px;
+            max-width: 100%;
+            height:158px;
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            z-index: 1;
+            transform: translateX(-50%);
+        }
+        #deadline-container svg {
+            width: 100%;
+        }
+        #progress-time-fill {
+            animation-name: progress-fill;	
+            animation-timing-function: linear;	
+            animation-iteration-count: infinite;
+        }
+        #death-group {
+            animation-name: walk;
+            animation-timing-function: ease;	
+            animation-iteration-count: infinite;
+            transform: translateX(0);
+        }
+        #death-arm {
+            animation: move-arm 3s ease infinite;
+            transform-origin: -60px 74px;
+        }
+        #death-tool {
+            animation: move-tool 3s ease infinite;
+            transform-origin: -48px center;
+        }
+        #designer-arm-grop {
+            animation: write 1.5s ease infinite;
+            transform: translate(0, 0) rotate(0deg) scale(1, 1);
+            transform-origin: 90% top;
+        }
+        .deadline-days {
+            color: #fff;
+            text-align: center;
+            width: 100px;
+            margin: 0 auto;
+            position: relative;
+            height: 20px;
+            font-family: 'Oswald', sans-serif;
+            margin-top: -20px;
+        }
+
+        /* Seção da Citação */
+        .quote-section {
+            padding: 80px 5%;
+            text-align: center;
+            background-color: var(--black-hand-panel);
+        }
+        .quote-text {
+            font-family: 'Cinzel', serif;
+            font-style: italic;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            max-width: 800px;
+            margin: 0 auto 20px;
+            line-height: 1.7;
+            color: #a0a0a0;
+        }
+        .quote-author {
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-yellow);
+        }
+
+        /* Seção Contato */
+        #contact {
+            text-align: center;
+        }
+        #contact .section-subtitle {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+            color: var(--text-color);
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent-yellow);
+            color: var(--dark-grey);
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            border-radius: 50px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(227, 253, 34, 0.2);
+        }
+
+        /* Rodapé */
+        .site-footer {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: var(--black-hand-panel);
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* Animações (Keyframes) */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes revealBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes progress-fill { 0% { x: -100%; } 100% { x: -3%; } }
+        @keyframes walk {
+            0%, 6% { transform: translateX(0); }
+            10% { transform: translateX(100px); }
+            15% { transform: translateX(140px); }
+            25% { transform: translateX(170px); }
+            35% { transform: translateX(220px); }
+            45% { transform: translateX(280px); }
+            55% { transform: translateX(340px); }
+            65% { transform: translateX(370px); }
+            75% { transform: translateX(430px); }
+            85% { transform: translateX(460px); }
+            100% { transform: translateX(520px); }
+        }
+        @keyframes move-arm { 0%, 5%, 80% { transform: rotate(0); } 9% { transform: rotate(40deg); } }
+        @keyframes move-tool { 0%, 5%, 80% { transform: rotate(0); } 9% { transform: rotate(50deg); } }
+        @keyframes write {
+            0%, 32%, 65% { transform: translate(0, 0) rotate(0deg) scale(1, 1); }
+            16% { transform: translate(0px, 0px) rotate(5deg) scale(0.8, 1); }
+            48% { transform: translate(0px, 0px) rotate(6deg) scale(0.8, 1); }
+            83% { transform: translate(0px, 0px) rotate(4deg) scale(0.8, 1); }
+        }
+        @keyframes show-flames {
+            0%, 74%, 100% { opacity: 0; }
+            80%, 99% { opacity: 1; }
+        }
+        #red-flame { animation: show-flames 20s ease infinite, red-flame-move 120ms ease infinite; transform-origin: center bottom; }
+        #yellow-flame { opacity: 0; animation: show-flames 20s ease infinite, yellow-flame-move 120ms ease infinite; transform-origin: center bottom; }
+        #white-flame { opacity: 0; animation: show-flames 20s ease infinite, red-flame-move 100ms ease infinite; transform-origin: center bottom; }
+        @keyframes red-flame-move {
+            0%, 100% { transform: translateY(-30px) scale(1, 1); }
+            25% { transform: translateY(-30px) scale(1.1, 1.1); }
+            75% { transform: translateY(-30px) scale(0.8, 0.7);	}
+        }
+        @keyframes yellow-flame-move {
+            0% { transform: translateY(-30px) scale(0.8, 0.7); }
+            50% { transform: translateY(-30px) scale(1.1, 1.2); }
+            100% { transform: translateY(-30px) scale(1, 1); }
+        }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .hero-container { grid-template-columns: 20% 1fr 20%; }
+            .hand-panel { opacity: 0.15; }
+            #name-title, .digital-text { font-size: clamp(3rem, 12vw, 6rem); }
+            .digital-highlight-wrapper { width: 100%; }
+            .yellow-bar { height: 60%; }
+            #impact-phrase { margin-top: 2rem; }
+            .portfolio-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        }
+
+        @media (max-width: 600px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto;
+            }
+            .hand-panel { grid-column: 1 / -1; grid-row: 1 / -1; opacity: 0.08; }
+            #left-hand-panel { background-position: center left; }
+            #right-hand-panel { background-position: center right; }
+            .main-content { grid-column: 1; grid-row: 2; }
+            #name-title, .digital-text { font-size: clamp(2.5rem, 15vw, 4.5rem); margin-bottom: 0.2rem; }
+            .digital-highlight-wrapper { margin-top: 0.2rem; }
+            #triplice-studio-text { margin-top: 1rem; }
+            #impact-phrase { font-size: 0.9rem; margin-top: 1.5rem; }
+            .bottom-right-nav, .bottom-left-explore {
+                grid-column: 1; grid-row: 3; justify-content: center; align-items: center; padding: 1rem;
+            }
+            .bottom-right-nav { flex-direction: row; gap: 1rem; grid-row: 4; }
+            .explore-link { font-size: 0.8rem; }
+            .corner-detail { display: none; }
+            .process-steps { flex-direction: column; align-items: center; }
+            .plan-item.recommended { transform: scale(1); }
+            #deadlines { padding-top: 220px; }
+            .modal-content { padding: 20px; }
+            #modal-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="custom-cursor">
+        <div id="cursor-ring"></div>
+    </div>
+
+    <header class="hero-container">
+        <div id="left-hand-panel" class="hand-panel">
+            <div class="corner-detail"></div>
+        </div>
+        
+        <div class="main-content">
+            <h1 id="name-title">Leonardo Machado</h1>
+            <div class="digital-highlight-wrapper">
+                <span class="digital-text">Digital</span>
+                <div class="yellow-bar"></div>
+            </div>
+            <p id="triplice-studio-text">Triplice Studios</p>
+            <p id="impact-phrase">
+                Não crio sites. Eu manifesto no digital a <span>essência da sua alma</span>, forjando portais que transmutam cliques em conexão.
+            </p>
+        </div>
+        
+        <div id="right-hand-panel" class="hand-panel"></div>
+
+        <div class="bottom-left-explore">
+            <a href="#portfolio" class="explore-link interactive-element">Explore</a>
+        </div>
+
+        <div class="bottom-right-nav">
+            <div class="nav-item interactive-element">
+                <a href="#contact">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0-8 4-8-4H4l8 4 8-4h2z"/></svg>
+                </a>
+            </div>
+            <div class="nav-item interactive-element">
+                <a href="https://wa.me/5541999767744?text=Olá,%20Leonardo!%20Vi%20seu%20portfólio%20e%20gostaria%20de%20manifestar%20um%20projeto." target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.911C.159 5.26 5.271.146 11.422.146c3.078 0 5.944 1.187 8.13 3.376 2.187 2.19 3.38 5.06 3.38 8.133 0 6.163-5.115 11.277-11.272 11.277-1.981 0-3.959-.53-5.685-1.53l-6.208 1.65zm6.541-4.413l-.493-.244c-1.042.607-2.188.944-3.419.944h-.003c-4.616 0-8.028-4.721-8.028-10.864 0-4.636 3.255-8.046 8.03-8.046 2.067 0 4.026.811 5.485 2.27c1.46 1.459 2.264 3.425 2.264 5.496 0 6.132-3.414 10.865-8.03 10.865zm6.57-4.478c-.34-.179-2.006-.983-2.32-.196-.314.787-1.218 1.636-1.503 1.95s-.583.351-1.077.135c-.494-.216-2.08-.767-3.966-2.456-1.466-1.309-2.455-2.92-2.74-3.414-.286-.493-.03-.767.202-1.002.219-.219.493-.532.74-.799.246-.266.329-.452.494-.767.164-.315.082-.591-.043-.836-.126-.246-.929-2.232-1.275-3.05-.337-.803-.674-.693-.92-.693-.246 0-.521-.036-.796-.036-.275 0-.714.103-1.076.512-.362.409-1.386 1.353-1.386 3.292 0 1.94 1.411 3.847 1.613 4.102.202.256 2.728 4.172 6.64 5.704 3.799 1.488 3.999 1.34 4.733 1.258.734-.082 2.319-.944 2.647-1.853.328-.91.328-1.722.23-1.954-.099-.232-.365-.351-.734-.545z"/></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="portfolio" class="content-section">
+            <h2 class="section-title">Portais <span>Manifestados</span></h2>
+            <p class="section-subtitle">Cada projeto é um universo em si, uma ponte entre o sagrado e o digital. Aqui estão alguns mundos que ajudei a nascer.</p>
+            <div class="portfolio-grid">
+                <!-- Projeto 1 -->
+                <div class="portfolio-item interactive-element" 
+                     data-img-src="https://placehold.co/800x600/1A1A1A/E3FD22?text=Templo+Luz+da+Mata"
+                     data-title="Templo de Umbanda Luz da Mata"
+                     data-desc="Um santuário online que acolhe e guia. A agenda de giras pulsa com a vida do templo, enquanto sua história sagrada é revelada, fortalecendo a comunidade e atraindo novas almas para a corrente."
+                     data-live-url="https://www.google.com">
+                    <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/E3FD22?text=Templo+de+Umbanda" alt="Projeto para Templo de Umbanda" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Templo de Umbanda Luz da Mata</h3>
+                    </div>
+                </div>
+                <!-- Projeto 2 -->
+                <div class="portfolio-item interactive-element"
+                     data-img-src="https://placehold.co/800x600/1A1A1A/F0F0F0?text=Alquimia+Ancestral"
+                     data-title="Alquimia Ancestral Loja"
+                     data-desc="Um e-commerce alquímico onde cada item é um artefato. A jornada de compra é um ritual, projetada para encantar e converter, com a segurança de um feitiço bem lançado."
+                     data-live-url="#">
+                    <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/F0F0F0?text=Loja+Esotérica" alt="Projeto para Loja Esotérica" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Alquimia Ancestral Loja</h3>
+                    </div>
+                </div>
+                <!-- Projeto 3 -->
+                <div class="portfolio-item interactive-element"
+                     data-img-src="https://placehold.co/800x600/1A1A1A/E3FD22?text=Morgana+Oráculos"
+                     data-title="Morgana Le Fay Oráculos"
+                     data-desc="Um oráculo virtual que espelha a sabedoria da consulente. O agendamento flui como o destino, em uma interface que evoca mistério, confiança e a seriedade da arte divinatória."
+                     data-live-url="#">
+                     <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/E3FD22?text=Oraculista" alt="Projeto para Oraculista" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Morgana Le Fay Oráculos</h3>
+                    </div>
+                </div>
+                <!-- Projeto 4 -->
+                <div class="portfolio-item interactive-element"
+                     data-img-src="https://placehold.co/800x600/1A1A1A/F0F0F0?text=Coven+da+Lua"
+                     data-title="Coven da Lua Negra"
+                     data-desc="Um espaço digital secreto para membros de um coven de bruxaria, com calendário lunar, grimório compartilhado e fórum para discussões aprofundadas."
+                     data-live-url="#">
+                    <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/F0F0F0?text=Coven+de+Bruxaria" alt="Projeto para Coven de Bruxaria" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Coven da Lua Negra</h3>
+                    </div>
+                </div>
+                <!-- Projeto 5 -->
+                <div class="portfolio-item interactive-element"
+                     data-img-src="https://placehold.co/800x600/1A1A1A/E3FD22?text=Raízes+Xamânicas"
+                     data-title="Raízes Xamânicas Terapias"
+                     data-desc="Portal para um terapeuta xamânico, apresentando suas práticas, jornadas e workshops. Um design orgânico que transmite a conexão com a natureza."
+                     data-live-url="#">
+                    <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/E3FD22?text=Terapias+Xamânicas" alt="Projeto para Terapias Xamânicas" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Raízes Xamânicas Terapias</h3>
+                    </div>
+                </div>
+                <!-- Projeto 6 -->
+                <div class="portfolio-item interactive-element"
+                     data-img-src="https://placehold.co/800x600/1A1A1A/F0F0F0?text=Podcast+Místico"
+                     data-title="Podcast Frequência Mística"
+                     data-desc="Uma landing page dedicada para um podcast esotérico, com player integrado, lista de episódios e links para todas as plataformas de streaming."
+                     data-live-url="#">
+                    <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/F0F0F0?text=Podcast+Esotérico" alt="Projeto para Podcast Esotérico" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Podcast Frequência Mística</h3>
+                    </div>
+                </div>
+                <!-- Projeto 7 -->
+                <div class="portfolio-item interactive-element"
+                     data-img-src="https://placehold.co/800x600/1A1A1A/E3FD22?text=Yoga+e+Astrologia"
+                     data-title="Cosmos Yoga Studio"
+                     data-desc="Site para um estúdio que une a prática de Yoga com os ciclos astrológicos. Integração com sistema de agendamento de aulas e workshops."
+                     data-live-url="#">
+                    <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/E3FD22?text=Yoga+Studio" alt="Projeto para Yoga Studio" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Cosmos Yoga Studio</h3>
+                    </div>
+                </div>
+                <!-- Projeto 8 -->
+                <div class="portfolio-item interactive-element"
+                     data-img-src="https://placehold.co/800x600/1A1A1A/F0F0F0?text=Ateliê+Mágico"
+                     data-title="Ateliê da Feiticeira"
+                     data-desc="Um portfólio visual para uma artesã de grimórios e varinhas mágicas, focado em imagens de alta qualidade e na história por trás de cada peça única."
+                     data-live-url="#">
+                    <div class="portfolio-image-wrapper">
+                        <img src="https://placehold.co/600x400/1A1A1A/F0F0F0?text=Artesanato+Mágico" alt="Projeto para Artesanato Mágico" class="portfolio-image">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Ateliê da Feiticeira</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- (O restante do conteúdo <main> permanece o mesmo) -->
+        
+        <section id="process" class="content-section">
+            <h2 class="section-title">A Alquimia da <span>Criação</span></h2>
+             <p class="section-subtitle">Todo grande feitiço segue um ritual. Meu processo é uma jornada em três atos, onde sua visão é o ingrediente principal e a tecnologia é minha ferramenta de poder.</p>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="icon">🔮</div>
+                    <h3>1. Imersão & Concepção</h3>
+                    <p>Nossa jornada começa na escuta. Mergulho na sua energia e no seu propósito sagrado para decifrar a geometria da sua alma e traduzi-la em um mapa digital.</p>
+                </div>
+                <div class="process-step">
+                    <div class="icon">✨</div>
+                    <h3>2. Ritual da Criação</h3>
+                    <p>Aqui, a intenção se torna matéria. O design é um sigilo, e cada linha de código, um encantamento. Forjo uma experiência que não é apenas vista, mas sentida.</p>
+                </div>
+                <div class="process-step">
+                    <div class="icon">🚀</div>
+                    <h3>3. Lançamento & Ascensão</h3>
+                    <p>Seu portal desperta. Ele é entregue ao mundo não como um fim, mas como um começo, otimizado para atrair, ressoar e ascender nas correntes digitais.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="plans" class="content-section">
+            <h2 class="section-title">Planos de <span>Manifestação</span></h2>
+            <p class="section-subtitle">Sua energia é única, e seu portal também deve ser. Escolha o caminho que mais ressoa com seu momento e sua missão.</p>
+            <div class="plans-grid">
+                <div class="plan-item">
+                    <h3>Portal Essencial</h3>
+                    <ul>
+                        <li>Um altar digital de página única</li>
+                        <li>Design místico e responsivo</li>
+                        <li>Apresentação de seus dons e serviços</li>
+                        <li>Conexão com suas redes sociais</li>
+                    </ul>
+                    <a href="https://wa.me/5541999767744?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Plano%20Portal%20Essencial." target="_blank" class="cta-button interactive-element">Consultar</a>
+                </div>
+                <div class="plan-item recommended">
+                    <h3>Portal Conector</h3>
+                    <ul>
+                        <li>Tudo do plano Essencial</li>
+                        <li>Formulário para contato direto</li>
+                        <li>Integração com botão do WhatsApp</li>
+                        <li>Espaço para depoimentos e provas sociais</li>
+                    </ul>
+                    <a href="https://wa.me/5541999767744?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Plano%20Portal%20Conector." target="_blank" class="cta-button interactive-element">Consultar</a>
+                </div>
+                <div class="plan-item">
+                    <h3>Portal Alquímico</h3>
+                    <ul>
+                        <li>Tudo do plano Conector</li>
+                        <li>Automação para agendamentos</li>
+                        <li>Hospedagem e domínio inclusos por 1 ano</li>
+                        <li>Otimização (SEO) para ser encontrado</li>
+                    </ul>
+                    <a href="https://wa.me/5541999767744?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Plano%20Portal%20Alquímico." target="_blank" class="cta-button interactive-element">Consultar</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="deadlines" class="content-section">
+            <div id="deadline-container">
+                <svg preserveAspectRatio="none" id="line" viewBox="0 0 581 158" enable-background="new 0 0 581 158">
+                    <!-- (O SVG complexo da animação permanece o mesmo) -->
+                    <g id="fire"><rect id="mask-fire-black" x="511" y="41" width="38" height="34"/><g><defs><rect id="mask_fire" x="511" y="41" width="38" height="34"/></defs><clipPath id="mask-fire_1_"><use xlink:href="#mask_fire" overflow="visible"/></clipPath><g id="group-fire" clip-path="url(#mask-fire_1_)"><path id="red-flame" fill="#B71342" d="M528.377,100.291c6.207,0,10.947-3.272,10.834-8.576 c-0.112-5.305-2.934-8.803-8.237-10.383c-5.306-1.581-3.838-7.9-0.79-9.707c-7.337,2.032-7.581,5.891-7.11,8.238 c0.789,3.951,7.56,4.402,5.077,9.48c-2.482,5.079-8.012,1.129-6.319-2.257c-2.843,2.233-4.78,6.681-2.259,9.703 C521.256,98.809,524.175,100.291,528.377,100.291z"/><path id="yellow-flame" opacity="0.71" fill="#F7B523" d="M528.837,100.291c4.197,0,5.108-1.854,5.974-5.417 c0.902-3.724-1.129-6.207-5.305-9.931c-2.396-2.137-1.581-4.176-0.565-6.32c-4.401,1.918-3.384,5.304-2.482,6.658 c1.511,2.267,2.099,2.364,0.42,5.8c-1.679,3.435-5.42,0.764-4.275-1.527c-1.921,1.512-2.373,4.04-1.528,6.563 C522.057,99.051,525.994,100.291,528.837,100.291z"/><path id="white-flame" opacity="0.81" fill="#FFFFFF" d="M529.461,100.291c-2.364,0-4.174-1.322-4.129-3.469 c0.04-2.145,1.117-3.56,3.141-4.198c2.022-0.638,1.463-3.195,0.302-3.925c2.798,0.821,2.89,2.382,2.711,3.332 c-0.301,1.597-2.883,1.779-1.938,3.834c0.912,1.975,3.286,0.938,2.409-0.913c1.086,0.903,1.826,2.701,0.864,3.924 C532.18,99.691,531.064,100.291,529.461,100.291z"/></g></g></g><g id="progress-trail"><path fill="#FFFFFF" d="M491.979,83.878c1.215-0.73-0.62-5.404-3.229-11.044c-2.583-5.584-5.034-10.066-7.229-8.878 c-2.854,1.544-0.192,6.286,2.979,11.628C487.667,80.917,490.667,84.667,491.979,83.878z"/><path fill="#FFFFFF" d="M571,76v-5h-23.608c0.476-9.951-4.642-13.25-4.642-13.25l-3.125,4c0,0,3.726,2.7,3.625,5.125 c-0.071,1.714-2.711,3.18-4.962,4.125H517v5h10v24h-25v-5.666c0,0,0.839,0,2.839-0.667s6.172-3.667,4.005-6.333 s-7.49,0.333-9.656,0.166s-6.479-1.5-8.146,1.917c-1.551,3.178,0.791,5.25,5.541,6.083l-0.065,4.5H16c-2.761,0-5,2.238-5,5v17 c0,2.762,2.239,5,5,5h549c2.762,0,5-2.238,5-5v-17c0-2.762-2.238-5-5-5h-3V76H571z"/><path fill="#FFFFFF" d="M535,65.625c1.125,0.625,2.25-1.125,2.25-1.125l11.625-22.375c0,0,0.75-0.875-1.75-2.125 s-3.375,0.25-3.375,0.25s-8.75,21.625-9.875,23.5S533.875,65,535,65.625z"/></g><g><defs><path id="SVGID_1_" d="M484.5,75.584c-3.172-5.342-5.833-10.084-2.979-11.628c2.195-1.188,4.646,3.294,7.229,8.878 c2.609,5.64,4.444,10.313,3.229,11.044C490.667,84.667,487.667,80.917,484.5,75.584z M571,76v-5h-23.608 c0.476-9.951-4.642-13.25-4.642-13.25l-3.125,4c0,0,3.726,2.7,3.625,5.125c-0.071,1.714-2.711,3.18-4.962,4.125H517v5h10v24h-25 v-5.666c0,0,0.839,0,2.839-0.667s6.172-3.667,4.005-6.333s-7.49,0.333-9.656,0.166s-6.479-1.5-8.146,1.917 c-1.551,3.178,0.791,5.25,5.541,6.083l-0.065,4.5H16c-2.761,0-5,2.238-5,5v17c0,2.762,2.239,5,5,5h549c2.762,0,5-2.238,5-5v-17 c0-2.762-2.238-5-5-5h-3V76H571z M535,65.625c1.125,0.625,2.25-1.125,2.25-1.125l11.625-22.375c0,0,0.75-0.875-1.75-2.125 s-3.375,0.25-3.375,0.25s-8.75,21.625-9.875,23.5S533.875,65,535,65.625z"/></defs><clipPath id="SVGID_2_"><use xlink:href="#SVGID_1_" overflow="visible"/></clipPath><rect id="progress-time-fill" x="-100%" y="34" clip-path="url(#SVGID_2_)" fill="#BE002A" width="586" height="103"/></g><g id="death-group"><path id="death" fill="#BE002A" d="M-46.25,40.416c-5.42-0.281-8.349,3.17-13.25,3.918c-5.716,0.871-10.583-0.918-10.583-0.918 C-67.5,49-65.175,50.6-62.083,52c5.333,2.416,4.083,3.5,2.084,4.5c-16.5,4.833-15.417,27.917-15.417,27.917L-75.5,84.75 c-1,12.25-20.25,18.75-20.25,18.75s39.447,13.471,46.25-4.25c3.583-9.333-1.553-16.869-1.667-22.75 c-0.076-3.871,2.842-8.529,6.084-12.334c3.596-4.22,6.958-10.374,6.958-15.416C-38.125,43.186-39.833,40.75-46.25,40.416z M-40,51.959c-0.882,3.004-2.779,6.906-4.154,6.537s-0.939-4.32,0.112-7.704c0.82-2.64,2.672-5.96,3.959-5.583 C-39.005,45.523-39.073,48.8-40,51.959z"/><path id="death-arm" fill="#BE002A" d="M-53.375,75.25c0,0,9.375,2.25,11.25,0.25s2.313-2.342,3.375-2.791 c1.083-0.459,4.375-1.75,4.292-4.75c-0.101-3.627,0.271-4.594,1.333-5.043c1.083-0.457,2.75-1.666,2.75-1.666 s0.708-0.291,0.5-0.875s-0.791-2.125-1.583-2.959c-0.792-0.832-2.375-1.874-2.917-1.332c-0.542,0.541-7.875,7.166-7.875,7.166 s-2.667,2.791-3.417,0.125S-49.833,61-49.833,61s-3.417,1.416-3.417,1.541s-1.25,5.834-1.25,5.834l-0.583,5.833L-53.375,75.25z"/><path id="death-tool" fill="#BE002A" d="M-20.996,26.839l-42.819,91.475l1.812,0.848l38.342-81.909c0,0,8.833,2.643,12.412,7.414 c5,6.668,4.75,14.084,4.75,14.084s4.354-7.732,0.083-17.666C-10,32.75-19.647,28.676-19.647,28.676l0.463-0.988L-20.996,26.839z"/></g><path id="designer-body" fill="#FEFFFE" d="M514.75,100.334c0,0,1.25-16.834-6.75-16.5c-5.501,0.229-5.583,3-10.833,1.666 c-3.251-0.826-5.084-15.75-0.834-22c4.948-7.277,12.086-9.266,13.334-7.833c2.25,2.583-2,10.833-4.5,14.167 c-2.5,3.333-1.833,10.416,0.5,9.916s8.026-0.141,10,2.25c3.166,3.834,4.916,17.667,4.916,17.667l0.917,2.5l-4,0.167L514.75,100.334z "/><circle id="designer-head" fill="#FEFFFE" cx="516.083" cy="53.25" r="6.083"/><g id="designer-arm-grop"><path id="designer-arm" fill="#FEFFFE" d="M505.875,64.875c0,0,5.875,7.5,13.042,6.791c6.419-0.635,11.833-2.791,13.458-4.041s2-3.5,0.25-3.875 s-11.375,5.125-16,3.25c-5.963-2.418-8.25-7.625-8.25-7.625l-2,1.125L505.875,64.875z"/><path id="designer-pen" fill="#FEFFFE" d="M525.75,59.084c0,0-0.423-0.262-0.969,0.088c-0.586,0.375-0.547,0.891-0.547,0.891l7.172,8.984l1.261,0.453 l-0.104-1.328L525.75,59.084z"/></g>
+                </svg>
+            </div>
+            <h2 class="section-title">O Tempo dos <span>Rituais</span></h2>
+            <p class="section-subtitle">A verdadeira magia exige tempo, mas a urgência da sua missão é a minha prioridade. Cada portal é forjado com foco e maestria, respeitando o fluxo sagrado da criação e a necessidade da sua manifestação no mundo.</p>
+            <div class="deadline-days">
+                Deadline <span class="day">7</span> <span class="days">days</span>
+            </div>
+        </section>
+
+        <section class="quote-section content-section">
+            <p class="quote-text">"Do éter, a intenção. Do código, a forma. Onde a vontade encontra a arte, a magia se manifesta no digital."</p>
+            <p class="quote-author">— O Códice do Tecelão Digital</p>
+        </section>
+
+        <section id="contact" class="content-section">
+             <h2 class="section-title">O Chamado para <span>Criar</span></h2>
+             <p id="contact-text" class="section-subtitle">O universo digital é um campo vasto de possibilidades. Sua voz, sua energia e sua missão merecem um espaço que vibre na mesma frequência. Se você sente o chamado para manifestar um portal que seja verdadeiramente seu, o momento é agora.</p>
+             <a href="https://wa.me/5541999767744?text=Olá,%20Leonardo!%20Sinto%20o%20chamado.%20Vamos%20manifestar%20meu%20projeto." target="_blank" class="cta-button interactive-element">Vamos Manifestar Juntos</a>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Leonardo Machado - Triplice Studios. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Modal do Portfólio -->
+    <div class="modal-overlay" id="portfolio-modal">
+        <div class="modal-content">
+            <a href="#" class="close-modal interactive-element">&times;</a>
+            <img src="" alt="Imagem do Projeto" id="modal-img">
+            <h3 id="modal-title"></h3>
+            <p id="modal-desc"></p>
+            <div id="modal-links">
+                <a href="#" id="modal-live-link" class="cta-button interactive-element" target="_blank" rel="noopener noreferrer">
+                    Ver Projeto ao Vivo
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Script do Cursor
+            const cursor = document.querySelector('.custom-cursor');
+            const interactiveElements = document.querySelectorAll('.interactive-element, a, button');
+
+            window.addEventListener('mousemove', e => {
+                cursor.style.left = `${e.clientX}px`;
+                cursor.style.top = `${e.clientY}px`;
+            });
+
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hover-effect'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hover-effect'));
+            });
+
+            // Animação de scroll para seções
+            const sections = document.querySelectorAll('.content-section');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Script do Modal do Portfólio
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+            const modal = document.getElementById('portfolio-modal');
+            const modalImg = document.getElementById('modal-img');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDesc = document.getElementById('modal-desc');
+            const modalLink = document.getElementById('modal-live-link');
+            const closeModalBtn = modal.querySelector('.close-modal');
+
+            portfolioItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const imgSrc = item.getAttribute('data-img-src');
+                    const title = item.getAttribute('data-title');
+                    const desc = item.getAttribute('data-desc');
+                    const liveUrl = item.getAttribute('data-live-url');
+
+                    modalImg.src = imgSrc;
+                    modalImg.alt = `Imagem do projeto ${title}`;
+                    modalTitle.textContent = title;
+                    modalDesc.textContent = desc;
+                    modalLink.href = liveUrl;
+                    
+                    if (liveUrl === "#" || liveUrl === "") {
+                        modalLink.style.display = 'none';
+                    } else {
+                        modalLink.style.display = 'inline-block';
+                    }
+
+                    modal.classList.add('active');
+                    document.body.classList.add('modal-open');
+                });
+            });
+
+            const closeModal = () => {
+                modal.classList.remove('active');
+                document.body.classList.remove('modal-open');
+            };
+
+            closeModalBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+
+           // Script para a Animação de Deadline
+            var animationTime = 20,
+            days = 7;
+
+            $('#progress-time-fill, #death-group').css({'animation-duration': animationTime+'s'});
+            
+            var deadlineAnimation = function () {
+                setTimeout(function(){ $('#designer-arm-grop').css({'animation-duration': '1.5s'}); }, 0);
+                setTimeout(function(){ $('#designer-arm-grop').css({'animation-duration': '1s'}); }, 4000);
+                setTimeout(function(){ $('#designer-arm-grop').css({'animation-duration': '0.7s'}); }, 8000);
+                setTimeout(function(){ $('#designer-arm-grop').css({'animation-duration': '0.3s'}); }, 12000);
+                setTimeout(function(){ $('#designer-arm-grop').css({'animation-duration': '0.2s'}); }, 15000);
+            };
+
+            function timer(totalTime, deadline) {
+                var time = totalTime * 1000;
+                var dayDuration = time / deadline;
+                var actualDay = deadline;
+                var timerInterval = setInterval(countTime, dayDuration);
+
+                function countTime() {
+                    --actualDay;
+                    $('.deadline-days .day').text(actualDay);
+                    if (actualDay <= 3) { // Muda para menos de 3 dias
+                        $('.deadline-days .days').text('dias!');
+                    } else {
+                        $('.deadline-days .days').text('dias');
+                    }
+                    if (actualDay <= 0) {
+                        clearInterval(timerInterval);
+                    }
+                }
+            }
+            
+            function startCycle() {
+                $('.deadline-days .day').text(days);
+                $('.deadline-days .days').text('dias');
+                deadlineAnimation();
+                timer(animationTime, days);
+            }
+            
+            startCycle();
+            setInterval(startCycle, animationTime * 1000);
+
+        });
+    </script>
+</body>
+</html>
